@@ -1,55 +1,22 @@
-var express = require('express');
+const express = require('express');
+const cors = require('cors');
+const dbRouter = require('./routes/db-routes');
+const app = express();
 
-var app = express();
-var data = [];
-
+app.use(cors());
 app.use(express.json());
 
-app.use((req, res, next) => {
-    //console.log('Testing that this happens', req.url);
-    next();
-})
+app.use('/find', dbRouter);
 
-app.get('/item/all', (req,res) => {
-    res.send(data);
+app.use((err, req, res, next) =>{
+    res.status(500).send({
+        error: 'Something went wrong',
+        message: err
+    });
 });
 
-app.get('/item/:index', (req, res) => {
-    res.send(data[req.params.index]);
+app.listen(8080, () => {
+    console.log('Server running on port 8080.')
 });
 
-app.post('/item/:index', (req,res) => {
-    data.push(req.params.index);
-    //res.status(201).send();
-    res.send(data);
-});
-
-app.put('/item/:index/:newData', (req, res) => {
-    data[+req.params.index] = req.params.newData;
-    res.send(data);
-});
-
-app.delete('/item/:index', (req, res) => {
-    data.splice(+req.params.index, 1);
-    res.send(data);
-});
-
-// app.get('/home', (req, res) => {
-//     console.log('hello');
-//     res.status(500);
-//     res.send('Please work');
-// });
-
-// app.post('/page2', (req, res) => {
-//     console.log('world');
-//     res.status(500);
-//     res.send(req.body);
-// });
-
-// app.post('/page3', (req, res) => {
-//     console.log('!');
-//     res.status(500);
-//     res.send('Page 3');
-// });
-
-app.listen(8080);
+module.exports = app;
